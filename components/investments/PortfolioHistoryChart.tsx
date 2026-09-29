@@ -1,0 +1,10 @@
+"use client";
+
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import type { PortfolioHistoryPoint } from "@/app/actions/investment-performance";
+function money(value: number, currency: string) { return new Intl.NumberFormat("es-PE", { style: "currency", currency: currency === "USDT" ? "USD" : currency, maximumFractionDigits: 2 }).format(value); }
+
+export default function PortfolioHistoryChart({ data, baseCurrency, benchmarkAnnualPct = 5 }: { data: PortfolioHistoryPoint[]; baseCurrency: string; benchmarkAnnualPct?: number }) {
+  if (data.length < 2) return <div className="flex min-h-64 items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 text-center text-sm text-white/40">Necesitamos datos de al menos dos fechas distintas para mostrar la evolución del patrimonio invertido.</div>;
+  return <div className="rounded-2xl border border-white/10 bg-white/5 p-4"><p className="text-sm font-medium text-white/80">Evolución del patrimonio invertido</p><p className="mt-1 text-xs text-white/45">Snapshots históricos frente a una referencia anual del {benchmarkAnnualPct.toFixed(1)}%, respetando los filtros.</p><ResponsiveContainer width="100%" height={260}><LineChart data={data} margin={{ top: 12, right: 8, left: 8, bottom: 4 }}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" /><XAxis dataKey="label" tick={{ fill: "#9CA3AF", fontSize: 11 }} /><YAxis tick={{ fill: "#9CA3AF", fontSize: 11 }} /><Tooltip formatter={(value, name) => [money(Number(value ?? 0), baseCurrency), name === "referenceValue" ? "Referencia" : "Patrimonio"]} contentStyle={{ backgroundColor: "#0B0F14", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} /><Line type="monotone" dataKey="value" name="Patrimonio" stroke="#60A5FA" strokeWidth={3} dot={{ r: 4, fill: "#60A5FA" }} /><Line type="monotone" dataKey="referenceValue" name="Referencia" stroke="#FBBF24" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer></div>;
+}
